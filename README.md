@@ -106,7 +106,7 @@ A password management system is used to keep track of all of the passwords requi
 ##### Get all passwords for current logged user [Token Required]
 `http://127.0.0.1:5000/pwd_list`
 
-
+------------
 ####**Database**
 
 #SQLite DB 
