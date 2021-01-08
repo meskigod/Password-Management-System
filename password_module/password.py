@@ -39,27 +39,24 @@ class Password:
             return True
         
         #Retrieves all available data classes from the HIBP API.
-        resp = pyhibp.get_data_classes()
-
         #Returns a listing of all sites breached in the HIBP database.
+        #Returns a single breach's information from the HIBP's database.
+        resp = pyhibp.get_data_classes()
         resp = pyhibp.get_all_breaches()
-
-        # Returns a single breach's information from the HIBP's database.
-        resp = pyhibp.get_single_breach(breach_name="Adobe")
+        resp = pyhibp.get_single_breach(breach_name="Amazon")
 
         #Set an API key for use in all future calls to the pyhibp module which search the HIBP database by email address.
         HIBP_API_KEY = None
 
         if HIBP_API_KEY:
-            # Set the API key prior to using the functions which require it.
+            #Set the API key prior to using the functions which require it.
             pyhibp.set_api_key(key=HIBP_API_KEY)
 
-            # Get pastes affecting a given email address
-            resp = pyhibp.get_pastes(email_address="test@example.com")
-
-            # Get breaches that affect a given account
-            resp = pyhibp.get_account_breaches(account="test@example.com", truncate_response=True)
+            #Get pastes affecting a given email address
+            resp = pyhibp.get_pastes(email_address="admin@gmail.com")
+            resp = pyhibp.get_account_breaches(account="admin@gmail.com", truncate_response=True)
     
+            
     @staticmethod
     def check_complexity(password):
         with open(basedir +'/'+complexity_file, 'r') as file:

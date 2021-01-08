@@ -76,7 +76,7 @@ def required_params(schema):
 #User Registration module 
 #User modes - Normal and administrator 
 # User registration module
-@app.route('/signup', methods=['POST'])
+@app.route('/user_registration', methods=['POST'])
 @required_params(UserSchema())
 def register():
 
@@ -144,7 +144,7 @@ def login():
             if Password.verify_password(password_check, cur_user_pwd):
                 login_session['id'] = user.id
                 expiry_date = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-                token = jwt.encode({"exp": expiry_date},app.config['SECRET_KEY'], algorithm="HS256").decode('utf-8')
+                token = jwt.encode({"exp": expiry_date},app.config['SECRET_KEY'], algorithm="HS256")
                 login_session['logged_in'] = True
                 return jsonify({
                     'user-id': user.id,

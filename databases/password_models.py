@@ -13,7 +13,7 @@ from password_module.password import Password
 #Create Legacy application model, database table and fields
 
 class LegacyApp(db.Model):
-    #Create a table
+    #Create a db table with id as primary key
     __tablename__ = 'tbl_legacy_application_list'
     app_name = db.Column(db.String(128), nullable=False )
     id = db.Column(db.Integer, nullable=False, primary_key=True, unique=True)

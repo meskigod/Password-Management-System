@@ -1,52 +1,58 @@
-#Unit test case APP Module
-#This test case include following sub test cases
-    #Register as a new ADMIN user
-    #Login to system using as a ADMIN user
-    #Check JWT Token validitiy
-    #Update Password complexity(This function require ADMIN access)
-    #Force renew password when system admin change the password complexity
-#Last Test date : 2020-12-18
-#Developer : Rajitha Fernando
-import unittest
-from json import dumps, loads, load
+###PMS Testing module###
+#Following are the test cases written 
+#Register as a new ADMIN user
+
+#1. Check if the user can be logged in as admin
+#2. Validity check - JWT token
+#3. Update password complexity - check if the system allows for admin access only
+#4. Force renew password when configuration changes
+
 import requests
+import unittest
 import json
+from json import dumps, loads, load
 from app import app, db
 from databases.password_models import Users
 from password_module.password import Password
 
+###admin@gmail.com
+###a23eSP$rt5
+
 class AppTest(unittest.TestCase):
 
+#setting up the login parameters
     def setUp(self):
         self.app  = app.test_client()
         self.app.testing = True
-        email = 'test@yahoo.com'
-        password = Password.password_hash('34D*&%Wgsju!')
+        email = 'admin@gmail.com'
+        password = Password.password_hash('a23eSP$rt5')
         role = 'ADMIN'
-        username = 'test'
+        username = 'admin'
         pwdcriteastatus = 1
         self.user = Users.add_new_user(username,password,email,role,pwdcriteastatus)
     
-    #Test login function  with correct useremail and password and this generate a token
+#Testing login function with correct username and login with admin access
+    
     def test_login(self):
         response = self.app.post('/login', 
             data = dumps({
-                "email":"test@yahoo.com",
-                "password": "34D*&%Wgsju!",
+                "email":"admin@gmail.com",
+                "password": "a23eSP$rt5",
             }), content_type='application/json'
         )
         reponse_data = loads(response.data)
         self.token = reponse_data['token']
-        self.assertEqual(reponse_data["email"], "test@yahoo.com")
+        self.assertEqual(reponse_data["email"], "admin@gmail.com")
         self.assertEqual(response.status_code, 200)
 
-    #Test Complexity update as a ADMIN user without having a proper Token(JWT)
-    #This test case generate 401 Error code.(Unauthorized)
+#Testing when the admin tries to update the password complexity criteria without a valid session JWT token
+#The test is check to whether the system does not allow the the user to change the criteria - Unauthorized access (401)
+    
     def test_update_complexity_without_JWT_token(self):
         resp_login = self.app.post('/login', 
             data = dumps({
-                "email":"test@yahoo.com",
-                "password": "34D*&%Wgsju!",
+                "email":"admin@gmail.com",
+                "password": "a23eSP$rt5",
             }),content_type='application/json'
         )
         reponse_data = loads(resp_login.data)
@@ -67,13 +73,14 @@ class AppTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 401)    
     
-    #Test Complexity update as a ADMIN user with having a proper Token(JWT)
-    #This test case generate 401 Error code.(Unauthorized)
+#Testing when the admin tries to update the password complexity criteria with a valid session JWT token
+#The test is check to whether the system allows to change the criteria for admin users only - success (200)
+
     def test_update_complexity(self):
         resp_login = self.app.post('/login', 
             data = dumps({
-                "email":"test@yahoo.com",
-                "password": "34D*&%Wgsju!",
+                "email":"admin@gmail.com",
+                "password": "a23eSP$rt5",
             }),content_type='application/json'
         )
         reponse_data = loads(resp_login.data)
@@ -94,19 +101,19 @@ class AppTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #Test case for Force renew password when system admin change the password complexity
-    #Once system admin change the password policy, All users will be get an NOTIFICATION when loggin to system
-    #At this moment I developed only notification level. Not update module
-    #Once user loging to system he or she will see "System adminstartor recently change the password policy. Please update the password!"
+#Testing to check if the users receive notification to change the password when the complexity criteria changes. The user gets notification on his next login
+
+#Message - "System adminstartor recently change the password policy. Please update the password!"
+
     def test_force_renew_password(self):
         response = self.app.post('/login', 
             data = dumps({
-                "email":"test@yahoo.com",
-                "password": "34D*&%Wgsju!",
+                "email":"admin@gmail.com",
+                "password": "a23eSP$rt5",
             }), content_type='application/json'
         )
         reponse_data = loads(response.data)
-        self.assertTrue(reponse_data["Message"], "System adminstartor recently change the password policy. Please update the password!")
+        self.assertTrue(reponse_data["Message"], "System administrator recently change the password policy. Please update the password!")
 
     def tearDown(self): 
         db.session.query(Users).delete()
